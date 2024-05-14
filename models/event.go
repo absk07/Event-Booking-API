@@ -52,3 +52,46 @@ func GetAllEvents() ([]Event, error) {
 	}
 	return events, err
 }
+
+func GetEventById(id string) (*Event, error) {
+	query := `
+		SELECT * FROM events WHERE id = $1
+	`
+	row :=  db.DB.QueryRow(query, id)
+	var e Event
+	err := row.Scan(&e.Id, &e.Name, &e.Description, &e.Location, &e.DateTime, &e.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &e, nil
+}
+
+func (e Event) Update() error {
+	query := `
+		UPDATE events
+		SET name = $1, description = $2, location = $3, dateTime = $4
+		WHERE id = $5 
+	`
+	stmt, err := db.DB.Prepare(query)
+	// fmt.Println("Query statement", stmt)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.Id)
+	return err
+}
+
+
+func (e Event) Delete() error {
+	query := `
+		DELETE FROM events WHERE id = $1
+	`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(e.Id)
+	return err
+}
