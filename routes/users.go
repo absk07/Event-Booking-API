@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"example.com/event-booking-api/models"
+	"example.com/event-booking-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -51,8 +52,18 @@ func signin(ctx *gin.Context) {
 		})
 		return
 	}
+	var token string
+	token, err = utils.GenerateToken(user.Email, user.Id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   "Could not authenticate user!",
+		})
+		return
+	}
 	ctx.JSON(http.StatusCreated, gin.H{
 		"success": true,
 		"message": "Signin successfull",
+		"token": token,
 	})
 }

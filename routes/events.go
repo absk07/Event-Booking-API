@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"example.com/event-booking-api/models"
+	"example.com/event-booking-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,8 +23,24 @@ func getEvents(ctx *gin.Context) {
 }
 
 func createEvent(ctx *gin.Context) {
+	token := ctx.Request.Header.Get("Authorization")
+	if token == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "User Unauthorized!",
+		})
+		return
+	}
+	err := utils.VerifyToken(token)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"error":   "User Unauthorized!",
+		})
+		return
+	}
 	var event models.Event
-	err := ctx.ShouldBindJSON(&event)
+	err = ctx.ShouldBindJSON(&event)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,

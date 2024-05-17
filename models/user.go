@@ -31,16 +31,16 @@ func (u User) Save() error {
 }
 
 func (u User) ValidateUser() error {
-	query := `SELECT password FROM users WHERE email = $1`
+	query := `SELECT id, password FROM users WHERE email = $1`
 	row := db.DB.QueryRow(query, u.Email)
 	var retrievedPassword string
-	err := row.Scan(&retrievedPassword)
+	err := row.Scan(&u.Id, &retrievedPassword)
 	if err != nil {
-		return errors.New("Invalid Credentials")
+		return errors.New("invalid credentials")
 	}
 	isPasswordValid := utils.IsPasswordValid(u.Password, retrievedPassword)
 	if !isPasswordValid {
-		return errors.New("Invalid Credentials")
+		return errors.New("invalid credentials")
 	}
 	return nil
 }
