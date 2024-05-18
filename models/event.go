@@ -17,7 +17,7 @@ type Event struct {
 	UserId      string
 }
 
-func (e Event) Save() error {
+func (e *Event) Save() error {
 	var err error
 	var stmt *sql.Stmt
 	query := `
@@ -66,7 +66,7 @@ func GetEventById(id string) (*Event, error) {
 	return &e, nil
 }
 
-func (e Event) Update() error {
+func (e *Event) Update() error {
 	query := `
 		UPDATE events
 		SET name = $1, description = $2, location = $3, dateTime = $4
@@ -83,7 +83,7 @@ func (e Event) Update() error {
 }
 
 
-func (e Event) Delete() error {
+func (e *Event) Delete() error {
 	query := `
 		DELETE FROM events WHERE id = $1
 	`

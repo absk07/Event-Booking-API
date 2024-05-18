@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	// "fmt"
 	"os"
 	"time"
 
@@ -22,7 +23,7 @@ func GenerateToken(email, userId string) (string, error) {
 	return token.SignedString([]byte(os.Getenv("SECRET")))
 }
 
-func VerifyToken(token string) error {
+func VerifyToken(token string) (string, error) {
 	parsedToken, err := jwt.Parse(token, func(tkn *jwt.Token) (any, error) {
 		_, isValidSigningMethod := tkn.Method.(*jwt.SigningMethodHMAC)
 		if !isValidSigningMethod {
@@ -31,17 +32,18 @@ func VerifyToken(token string) error {
 		return []byte(os.Getenv("SECRET")), nil
 	})
 	if err != nil {
-		return errors.New("could not parse token")
+		return "", errors.New("could not parse token")
 	}
 	isTokenValid := parsedToken.Valid
 	if !isTokenValid {
-		return errors.New("invalid token")
+		return "", errors.New("invalid token")
 	}
-	// claims, ok := parsedToken.Claims.(jwt.MapClaims)
-	// if !ok {
-	// 	return errors.New("Invalid token claims!")
-	// }
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", errors.New("invalid token claims")
+	}
+	// fmt.Println("Claims", claims)
 	// email := claims["email"].(string)
-	// userId := claims["userId"].(string)
-	return nil
+	userId := claims["userId"].(string)
+	return userId, nil
 }

@@ -1,6 +1,7 @@
 package routes
 
 import (
+	// "fmt"
 	"net/http"
 
 	"example.com/event-booking-api/models"
@@ -44,7 +45,6 @@ func signin(ctx *gin.Context) {
 		return
 	}
 	err = user.ValidateUser()
-	// fmt.Print(err)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -54,6 +54,7 @@ func signin(ctx *gin.Context) {
 	}
 	var token string
 	token, err = utils.GenerateToken(user.Email, user.Id)
+	// fmt.Print(user)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
