@@ -95,3 +95,31 @@ func (e *Event) Delete() error {
 	_, err = stmt.Exec(e.Id)
 	return err
 }
+
+func (e *Event) RegisterInEvent(userId string) error {
+	query := `
+		INSERT INTO registrations(id, event_id, user_Id) VALUES($1, $2, $3)
+	`
+	stmt, err := db.DB.Prepare(query)
+	// fmt.Println("Query statement", stmt)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(uuid.New().String(), e.Id, userId)
+	return err
+}
+
+func (e *Event) CancleRegistration(userId string) error {
+	query := `
+		DELETE FROM registrations WHERE event_id = $1 AND user_id = $2
+	`
+	stmt, err := db.DB.Prepare(query)
+	// fmt.Println("Query statement", stmt)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(e.Id, userId)
+	return err
+}

@@ -42,7 +42,8 @@ func CreateTable() {
 		fmt.Println(err)
 		panic("Error creating Users Table")
 	}
-	fmt.Println("Events Table created!")
+	fmt.Println("Users Table created!")
+
 	createEventsTable := `
 		CREATE TABLE IF NOT EXISTS events (
 			id VARCHAR(60) PRIMARY KEY,
@@ -60,4 +61,20 @@ func CreateTable() {
 		panic("Error creating Events Table")
 	}
 	fmt.Println("Events Table created!")
+
+	createRegistrationsTable := `
+		CREATE TABLE IF NOT EXISTS registrations (
+			id VARCHAR(60) PRIMARY KEY,
+			event_id VARCHAR(60),
+			user_id VARCHAR(60),
+			FOREIGN KEY(event_id) REFERENCES events(id),
+			FOREIGN KEY(user_id) REFERENCES users(id)
+		)
+	`
+	_, err = DB.Exec(createRegistrationsTable)
+	if err != nil {
+		fmt.Println(err)
+		panic("Error creating Registrations Table")
+	}
+	fmt.Println("Registrations Table created!")
 }
